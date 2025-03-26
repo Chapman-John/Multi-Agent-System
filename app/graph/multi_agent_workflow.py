@@ -20,7 +20,7 @@ def create_multi_agent_graph(
     reviewer: ReviewerAgent
 ):
     """
-    Create a multi-agent workflow using LangGraph
+    a multi-agent workflow using LangGraph
     
     Args:
         researcher (ResearcherAgent): Agent responsible for research
