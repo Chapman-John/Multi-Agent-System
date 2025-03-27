@@ -1,4 +1,4 @@
-# Multi-Agent AI System
+# Multi-Agent Generative AI System
 
 ## Overview
 
