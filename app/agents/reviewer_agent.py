@@ -42,7 +42,7 @@ class ReviewerAgent(BaseAgent):
         """
         
         # Generate review using LLM
-        review_feedback = await self.llm.apredict(review_prompt)
+        review_feedback = await self._call_llm(review_prompt)
         
         # Determine if revisions are needed
         revision_needed = await self._determine_revision_needed(review_feedback)
@@ -72,5 +72,5 @@ class ReviewerAgent(BaseAgent):
         Respond with REVISION_NEEDED or NO_REVISION based on the severity of feedback.
         """
         
-        response = await self.llm.apredict(revision_prompt)
+        response = await self._call_llm(revision_prompt)
         return "REVISION_NEEDED" in response

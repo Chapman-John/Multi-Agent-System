@@ -41,7 +41,7 @@ class WriterAgent(BaseAgent):
         Draft:
         """
         
-        draft = await self.llm.apredict(draft_prompt)
+        draft = await self._call_llm(draft_prompt)
         
         # Update and return state
         return {

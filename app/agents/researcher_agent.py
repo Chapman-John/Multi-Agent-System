@@ -44,7 +44,7 @@ class ResearcherAgent(BaseAgent):
         Provide a comprehensive and concise summary of the key findings.
         """
         
-        synthesized_research = await self.llm.apredict(synthesis_prompt)
+        synthesized_research = await self._call_llm(synthesis_prompt)
         
         # Update and return state
         return {
