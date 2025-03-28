@@ -30,13 +30,18 @@ async def process_request():
         # Run the workflow
         result = await graph.ainvoke({"input": input_text})
         
+        # Add more detailed logging
+        print("Workflow Result:", result)
+        
+        output = result.get('final_output', 'No output generated')
+        
         return jsonify({
             "status": "success",
-            "output": result.get('final_output')
+            "output": output
         })
     except Exception as e:
         error_trace = traceback.format_exc()
-        print(f"Error in process_request: {str(e)}\n{error_trace}")  # Log the error
+        print(f"Detailed Error in process_request:\n{error_trace}")
         return jsonify({
             "status": "error", 
             "message": str(e),
