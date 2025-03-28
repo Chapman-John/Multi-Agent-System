@@ -39,6 +39,7 @@ class Config:
 def create_agents(config=Config):
     from openai import OpenAI
     from langchain_openai import ChatOpenAI
+    from app.utils.tools import WebSearchTool, create_tool
     
     client = OpenAI(api_key=config.OPENAI_API_KEY)
     
@@ -63,11 +64,14 @@ def create_agents(config=Config):
     from app.agents.writer_agent import WriterAgent
     from app.agents.reviewer_agent import ReviewerAgent
     
+    # Create web search tool
+    web_search_tool = create_tool(WebSearchTool)
+    
     # Create agents with appropriate tools and configurations
     researcher = ResearcherAgent(
         name=config.AGENT_CONFIGS['researcher']['name'],
         llm=researcher_llm,
-        tools=[]  # Add specific research tools here
+        tools=[web_search_tool]  
     )
     
     writer = WriterAgent(
