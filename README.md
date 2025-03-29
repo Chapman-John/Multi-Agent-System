@@ -10,6 +10,9 @@ This project represents a cutting-edge multi-agent AI application leveraging adv
 - Flask
 - Docker
 
+The multi-agent system now follows this workflow:
+Query → RAG Processing → Research → Writing → Review → Final Output
+
 ### Core Technologies
 - **LangChain & LangGraph**: Advanced frameworks for building intelligent, event-driven AI workflows
 - **Large Language Models (LLMs)**: Intelligent reasoning and decision-making engines
