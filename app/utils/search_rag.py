@@ -6,6 +6,9 @@ from langchain_community.retrievers import TavilySearchAPIRetriever
 import os
 import json
 import hashlib
+from langchain_community.vectorstores.utils import filter_complex_metadata
+
+
 
 class SearchRAGTool:
     """Tool for web search and RAG integration"""
@@ -64,7 +67,8 @@ class SearchRAGTool:
         Returns:
             List[Document]: Retrieved documents
         """
-        results = await self.search_retriever.agetdocs(query=query)
+        
+        results = await self.search_retriever.aget_relevant_documents(query)
         
         # Cache search results in vector store
         if results:
@@ -80,6 +84,7 @@ class SearchRAGTool:
             query (str): Original query
             documents (List[Document]): Documents to add
         """
+        documents = filter_complex_metadata(documents)
         # Add query to metadata
         for doc in documents:
             doc.metadata["query"] = query

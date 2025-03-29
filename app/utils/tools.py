@@ -1,5 +1,5 @@
 from langchain_core.tools import BaseTool
-from typing import Optional, Type
+from typing import Optional, Type, Callable, Any
 import asyncio
 
 class WebSearchTool(BaseTool):
@@ -8,9 +8,12 @@ class WebSearchTool(BaseTool):
     """
     name: str = "web_search"
     description: str = "Perform a web search and retrieve relevant information"
+    search_service: Optional[Callable] = None  # Properly declare the field here
     
-    def __init__(self, search_service=None):
-        super().__init__()
+    def __init__(self, search_service=None, **kwargs):
+        # Initialize the Pydantic model first
+        super().__init__(**kwargs)
+        # Then set the attribute
         self.search_service = search_service or self._default_search
     
     async def _default_search(self, query: str) -> str:
