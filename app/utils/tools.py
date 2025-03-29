@@ -6,8 +6,8 @@ class WebSearchTool(BaseTool):
     """
     Custom web search tool for research agent
     """
-    name = "web_search"
-    description = "Perform a web search and retrieve relevant information"
+    name: str = "web_search"
+    description: str = "Perform a web search and retrieve relevant information"
     
     def __init__(self, search_service=None):
         super().__init__()
