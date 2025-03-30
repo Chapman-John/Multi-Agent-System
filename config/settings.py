@@ -74,6 +74,13 @@ def create_agents(config=Config):
             persist_dir=config.VECTOR_DB_PATH
         )
     
+    # Register cleanup handler
+        import atexit
+        atexit.register(lambda: search_rag_tool.vector_store._client.close() 
+                         if hasattr(search_rag_tool, 'vector_store') and 
+                            hasattr(search_rag_tool.vector_store, '_client') 
+                         else None)
+    
     # Create LLM instances for each agent
     # Use MCP if enabled, otherwise use OpenAI/other models
     if config.MCP_ENABLED and config.ANTHROPIC_API_KEY:

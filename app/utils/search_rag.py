@@ -162,3 +162,20 @@ class SearchRAGTool:
         """
         self.vector_store.add_documents(documents)
         self.vector_store.persist()
+
+    def __del__(self):
+        """Destructor to clean up resources"""
+        self.close()
+
+    def close(self):
+        """
+        Close the vector store and release resources
+        """
+        if hasattr(self, 'vector_store'):
+            try:
+                # Some vector stores have explicit cleanup methods
+                if hasattr(self.vector_store, '_client'):
+                    self.vector_store._client.close()
+                # Other cleanup as needed
+            except Exception as e:
+                print(f"Error closing vector store: {e}")
