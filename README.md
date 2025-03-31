@@ -8,7 +8,8 @@ This project implements a state-of-the-art multi-agent AI system that leverages 
 
 By combining specialized agents with distinct capabilities, this system delivers comprehensive, accurate, and well-structured responses to user queries.
 
-![Multi-Agent Workflow](https://via.placeholder.com/800x400?text=Multi-Agent+Workflow)
+![Multi-Agent Workflow](![image](https://github.com/user-attachments/assets/c20ed1e5-7673-4a78-8b2a-bc60d07401d4)
+)
 
 ## ✨ Key Features
 
