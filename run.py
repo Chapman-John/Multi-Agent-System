@@ -2,6 +2,7 @@ from flask import Flask, Blueprint, render_template_string, jsonify, send_file
 from app.routes.main_routes import main_bp
 from config.settings import Config
 import io
+import atexit
 
 # Create a blueprint for documentation
 docs_bp = Blueprint('docs', __name__)
@@ -148,6 +149,15 @@ def create_app():
         }), 500
     
     return app
+
+def cleanup_resources():
+    # Close any resources that might hold semaphores
+    # This could include vector stores, embedding models, etc.
+    print("Cleaning up resources...")
+    # Add specific cleanup code here
+
+# Register the cleanup function
+atexit.register(cleanup_resources)
 
 if __name__ == '__main__':
     app = create_app()

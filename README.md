@@ -1,120 +1,171 @@
 # Multi-Agent Generative AI System
 
-## Overview
+## 🚀 Overview
 
-This project represents a cutting-edge multi-agent AI application leveraging advanced language model technologies and intelligent system design.
+This project implements a state-of-the-art multi-agent AI system that leverages advanced language models and intelligent workflow orchestration to process complex information requests. The system follows an optimized workflow:
 
-- LangChain
-- LangGraph
-- OpenAI
-- Flask
-- Docker
+**Query → RAG Processing → Research → Writing → Review → Final Output**
 
-The multi-agent system now follows this workflow:
-Query → RAG Processing → Research → Writing → Review → Final Output
+By combining specialized agents with distinct capabilities, this system delivers comprehensive, accurate, and well-structured responses to user queries.
 
-### Core Technologies
-- **LangChain & LangGraph**: Advanced frameworks for building intelligent, event-driven AI workflows
-- **Large Language Models (LLMs)**: Intelligent reasoning and decision-making engines
-- **Cloud-Native Architecture**: Designed for scalability and flexibility
-- **Event-Driven System**: Enables complex, adaptive agent interactions
+![Multi-Agent Workflow](https://via.placeholder.com/800x400?text=Multi-Agent+Workflow)
 
-## Architecture Highlights
+## ✨ Key Features
 
-### Intelligent Agent Ecosystem
-- **Modular Agent Design**: Specialized agents with distinct roles and capabilities
-- **Dynamic Workflow Orchestration**: Agents collaborate and communicate seamlessly
-- **Adaptive Problem-Solving**: Intelligent routing and task allocation
+- **Intelligent Multi-Agent Collaboration**: Specialized agents work together through a sophisticated orchestration system
+- **Advanced RAG Integration**: Retrieval-Augmented Generation enhances responses with relevant context
+- **Dynamic Research Capabilities**: Comprehensive information gathering from multiple sources
+- **Quality-Focused Processing**: Built-in review and revision process ensures high-quality outputs
+- **Scalable Architecture**: Cloud-ready design supports distributed deployment
 
-### Key Components
-- **Researcher Agent**: Conducts comprehensive information gathering
-- **Writer Agent**: Synthesizes research into coherent content
-- **Reviewer Agent**: Provides critical analysis and quality assurance
-- **Advanced Communication Protocol**: Standardized inter-agent messaging
-- **Contextual Memory System**: Persistent learning and knowledge retention
+## 🔧 Core Technologies
 
-## Technical Architecture
+| Component | Technologies |
+|-----------|--------------|
+| **Framework** | LangChain, LangGraph |
+| **Models** | OpenAI, Anthropic Claude |
+| **Backend** | Flask, Python 3.9+ |
+| **Infrastructure** | Docker, Cloud-ready |
+| **Search & Retrieval** | Tavily, ChromaDB |
 
-### Event-Driven Workflow
-- Leverages LangGraph for state-based workflow management
-- Implements intelligent conditional routing
-- Supports complex, adaptive task sequences
+## 📊 System Architecture
 
-### Tool Integration
-- Multiple search source support
-- Dynamic tool registry
-- Extensible tool management system
+### Agent Ecosystem
 
-### Cloud and Scalability
-- **Cloud-Ready**: Containerized with Docker
-- **Deployment Flexibility**: Supports multiple cloud platforms (GCP, AWS)
-- **Horizontal Scalability**: Designed for distributed computing
+The system employs specialized agents, each with distinct responsibilities:
 
-## Prerequisites
+1. **RAG Agent**: Enhances queries with relevant context from vector stores and search results
+2. **Researcher Agent**: Gathers comprehensive information from multiple sources
+3. **Writer Agent**: Synthesizes research into coherent, well-structured content
+4. **Reviewer Agent**: Provides critical analysis and quality assurance
+
+### Workflow Orchestration
+
+- **Event-Driven Design**: LangGraph enables sophisticated state management
+- **Conditional Processing**: Intelligent routing based on quality assessments
+- **Iterative Refinement**: Automatic revision cycles ensure high-quality output
+
+### Advanced RAG Implementation
+
+- **Hybrid Search**: Combines vector similarity with keyword search
+- **Document Deduplication**: Intelligent merging of information from multiple sources
+- **Persistent Vector Storage**: Efficient caching of previously retrieved information
+
+## 🛠️ Installation
+
+### Prerequisites
 
 - Python 3.9+
 - OpenAI API Key
-- Docker (optional)
+- Tavily API Key (for web search)
+- Anthropic API Key (optional, for Claude models)
 
-## Quick Start
+### Method 1: Local Installation
 
-### 1. Clone the Repository
 ```bash
+# Clone the repository
 git clone https://github.com/Chapman-John/multi-agent-system.git
 cd multi-agent-system
-```
 
-### 2. Setup Virtual Environment
-```bash
-# python3 -m venv env
-python3.11 -m venv env 
-source env/bin/activate  # On Windows: multiagent_env\Scripts\activate
-```
+# Create and activate virtual environment
+python3.11 -m venv env
+source env/bin/activate  # On Windows: env\Scripts\activate
 
-### 3. Install Dependencies
-```bash
+# Install dependencies
 pip install -r requirements.txt
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env with your API keys and configuration
 ```
 
-### 4. Configure Environment
-Create a `.env` file:
-```
-OPENAI_API_KEY=your_openai_api_key
-SECRET_KEY=your_secret_key
-```
+### Method 2: Docker Deployment
 
-### 5. Run the Application
 ```bash
+# Build the Docker image
+docker build -t multi-agent-ai .
+
+# Run the container
+docker run -p 5000:5000 -e OPENAI_API_KEY=your_key -e TAVILY_API_KEY=your_key multi-agent-ai
+```
+
+## 🚀 Usage
+
+### Starting the Application
+
+```bash
+# Run the application
 python run.py
 ```
 
-### 6. Docker Deployment (Optional)
-```bash
-docker build -t multi-agent-ai .
-docker run -p 5000:5000 multi-agent-ai
+The application will be available at http://localhost:5000
+
+### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/process` | POST | Process a query through the full multi-agent workflow |
+| `/api/search` | POST | Perform direct document search without full processing |
+
+### Example API Request
+
+```python
+import requests
+
+response = requests.post('http://localhost:5000/api/process', 
+                         json={'input': 'Explain the impact of quantum computing on cryptography'})
+
+result = response.json()
+print(result['output'])
 ```
 
-## Configuration Options
+## 🧩 Advanced Configuration
 
-### Agent Customization
-- Modify `config/settings.py` to adjust agent behaviors
-- Configure LLM parameters
-- Add custom tools in `app/utils/tools.py`
+### Customizing Agent Behavior
 
-## Advanced Features
+Edit `config/settings.py` to modify:
 
-- **Contextual Memory**: Agents learn and retain information
-- **Multi-Source Search**: Comprehensive information gathering
-- **Adaptive Workflows**: Dynamic task routing
+- LLM parameters (temperature, model selection)
+- Agent specialization settings
+- Tool configuration and integration
 
-## Contributing
+### Adding Custom Tools
+
+Extend the system's capabilities by implementing custom tools in `app/utils/tools.py`:
+
+```python
+from app.utils.tools import create_tool
+from langchain_core.tools import BaseTool
+
+class CustomSearchTool(BaseTool):
+    name = "custom_search"
+    description = "Search a specialized database"
+    
+    async def _arun(self, query: str) -> str:
+        # Implementation goes here
+        pass
+
+# Register your tool in config/settings.py
+```
+
+## 📊 Performance Optimization
+
+- **Memory Management**: Configure `app/utils/search_rag.py` for optimal vector storage
+- **Caching**: Adjust caching parameters in `config/settings.py`
+- **Model Selection**: Balance performance and quality by selecting appropriate LLMs
+
+## 🤝 Contributing
+
+We welcome contributions to enhance this multi-agent system!
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+## 📄 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
+
+
