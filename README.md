@@ -60,8 +60,8 @@ The system employs specialized agents, each with distinct responsibilities:
 
 - Python 3.9+
 - OpenAI API Key
-- Tavily API Key (for web search)
-- Anthropic API Key (optional, for Claude models)
+- Tavily API Key 
+- Anthropic API Key 
 
 ### Method 1: Local Installation
 
