@@ -87,6 +87,9 @@ class SearchRAGTool:
         documents = filter_complex_metadata(documents)
         # Add query to metadata
         for doc in documents:
+            # Before storing or after retrieving
+            if "query" in doc.metadata:
+                del doc.metadata["query"]  # Remove old query information
             doc.metadata["query"] = query
             doc.metadata["source_type"] = "web_search"
         
