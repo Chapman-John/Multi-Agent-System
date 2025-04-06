@@ -8,7 +8,10 @@ This project implements a state-of-the-art multi-agent AI system that leverages 
 
 By combining specialized agents with distinct capabilities, this system delivers comprehensive, accurate, and well-structured responses to user queries.
 
-![Multi-Agent Workflow](https://via.placeholder.com/800x400?text=Multi-Agent+Workflow)
+
+![image](https://github.com/user-attachments/assets/bce905c5-a091-4db8-8809-004eae8ac70c)
+
+
 
 ## ✨ Key Features
 
@@ -57,8 +60,8 @@ The system employs specialized agents, each with distinct responsibilities:
 
 - Python 3.9+
 - OpenAI API Key
-- Tavily API Key (for web search)
-- Anthropic API Key (optional, for Claude models)
+- Tavily API Key 
+- Anthropic API Key 
 
 ### Method 1: Local Installation
 
