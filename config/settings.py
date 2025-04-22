@@ -19,6 +19,18 @@ class Config:
     
     # Storage settings
     VECTOR_DB_PATH = os.getenv('VECTOR_DB_PATH', './agent_cache/vector_db')
+
+    # Rate Limiting Configuration
+    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+    REDIS_PORT = int(os.getenv('REDIS_PORT', 6379))
+    REDIS_DB = int(os.getenv('REDIS_DB', 0))
+        
+    # Rate limit tiers
+    RATE_LIMIT_TIERS = {
+        'free': {'per_minute': 10, 'per_day': 100},
+        'basic': {'per_minute': 30, 'per_day': 1000},
+        'premium': {'per_minute': 100, 'per_day': 10000}
+    }
     
     # Agent Configuration
     AGENT_CONFIGS = {

@@ -14,3 +14,4 @@ pytest-mock>=3.12.0
 tavily-python>=0.2.8 
 chromadb>=0.4.22  # For vector storage in RAG
 langchain-chroma>=0.1.0  
+redis>=4.5.1

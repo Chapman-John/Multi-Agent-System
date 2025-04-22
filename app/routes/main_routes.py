@@ -8,6 +8,7 @@ from langchain_core.documents import Document
 main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/process', methods=['POST'])
+@rate_limit(tier='free')
 async def process_request():
     """
     Main endpoint for multi-agent processing

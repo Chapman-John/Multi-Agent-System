@@ -128,6 +128,10 @@ def index():
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    # Register middleware
+    from app.middleware.rate_limiter import setup_rate_limiter
+    setup_rate_limiter(app)
     
     # Register blueprints
     app.register_blueprint(docs_bp)  # Root route serves frontend
