@@ -8,10 +8,7 @@ This project implements a state-of-the-art multi-agent AI system that leverages 
 
 By combining specialized agents with distinct capabilities, this system delivers comprehensive, accurate, and well-structured responses to user queries.
 
-
 ![image](https://github.com/user-attachments/assets/bce905c5-a091-4db8-8809-004eae8ac70c)
-
-
 
 ## ✨ Key Features
 
@@ -170,5 +167,3 @@ We welcome contributions to enhance this multi-agent system!
 ## 📄 License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-
