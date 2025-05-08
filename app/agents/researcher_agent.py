@@ -2,6 +2,7 @@ from app.agents.base_agent import BaseAgent
 from langchain_core.language_models import BaseLanguageModel
 from langchain_core.tools import BaseTool
 from typing import Dict, Any
+from app.middleware.agent_middleware import with_retry
 
 class ResearcherAgent(BaseAgent):
     def __init__(self, 
@@ -9,7 +10,8 @@ class ResearcherAgent(BaseAgent):
                  llm: BaseLanguageModel, 
                  tools: list[BaseTool] = None):
         super().__init__(name, llm, tools)
-        
+    
+    @with_retry(max_retries=3)
     async def process(self, state: Dict[str, Any]) -> Dict[str, Any]:
         """
         Conduct research based on the input query
