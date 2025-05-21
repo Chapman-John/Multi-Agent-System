@@ -51,3 +51,52 @@ def rate_limit(requests_per_minute=60, tier='free'):
             return f(*args, **kwargs)
         return wrapped_function
     return decorator
+
+
+def verify_rate_limit(api_key=None):
+    """
+    Verify rate limit for an API key and return the associated tier
+    
+    Args:
+        api_key (str, optional): API key to verify
+        
+    Returns:
+        str: Associated tier ('free', 'basic', or 'premium')
+    """
+    # Simple implementation to determine tier based on API key
+    # This could be expanded to check a database of registered keys
+    if not api_key:
+        return 'free'
+    
+    # Example mapping of API keys to tiers
+    # In a real implementation, this would query a database
+    if api_key.startswith('premium_'):
+        return 'premium'
+    elif api_key.startswith('basic_'):
+        return 'basic'
+    else:
+        return 'free'
+
+def setup_rate_limiter(app):
+    """
+    Configure the rate limiter for a Flask application
+    
+    Args:
+        app (Flask): Flask application instance
+    """
+    # Configure Redis connection based on app config
+    global redis_client
+    redis_client = redis.Redis(
+        host=app.config.get('REDIS_HOST', 'localhost'),
+        port=int(app.config.get('REDIS_PORT', 6379)),
+        db=int(app.config.get('REDIS_DB', 0))
+    )
+    
+    # Registering error handlers for rate limit errors
+    
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return jsonify({
+            "status": "error",
+            "message": "Rate limit exceeded. Please try again later."
+        }), 429
