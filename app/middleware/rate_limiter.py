@@ -1,75 +1,41 @@
-from flask import request, jsonify
+from fastapi import Request, HTTPException
+from fastapi.responses import JSONResponse
 import redis
 import time
-from functools import wraps
+from starlette.middleware.base import BaseHTTPMiddleware
+from typing import Optional
 
 # Redis connection for storing rate limit data
 redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
-def rate_limit(requests_per_minute=60, tier='free'):
-    def decorator(f):
-        @wraps(f)
-        def wrapped_function(*args, **kwargs):
-            # Get client identifier (API key or user ID)
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Only apply rate limiting to API endpoints
+        if request.url.path.startswith('/api/'):
+            # Get API key from headers
             api_key = request.headers.get('X-API-Key', 'anonymous')
             
-            # Create Redis keys for this user
-            minute_key = f'rate_limit:{api_key}:{int(time.time()) // 60}'
-            daily_key = f'daily_quota:{api_key}:{int(time.time()) // 86400}'
-            
-            # Get current usage counts
-            minute_count = redis_client.incr(minute_key)
-            # Set expiration if new key
-            if minute_count == 1:
-                redis_client.expire(minute_key, 60)
-                
-            daily_count = redis_client.incr(daily_key)
-            if daily_count == 1:
-                redis_client.expire(daily_key, 86400)  # 24 hours
-            
-            # Define tier limits
-            tier_limits = {
-                'free': {'per_minute': 10, 'per_day': 100},
-                'basic': {'per_minute': 30, 'per_day': 1000},
-                'premium': {'per_minute': 100, 'per_day': 10000}
-            }
+            # Determine tier
+            tier = determine_tier(api_key)
             
             # Check rate limits
-            if minute_count > tier_limits[tier]['per_minute']:
-                return jsonify({
-                    "status": "error",
-                    "message": "Rate limit exceeded. Try again later."
-                }), 429
-                
-            if daily_count > tier_limits[tier]['per_day']:
-                return jsonify({
-                    "status": "error",
-                    "message": "Daily quota exceeded."
-                }), 429
-                
-            # If within limits, process the request
-            return f(*args, **kwargs)
-        return wrapped_function
-    return decorator
-
-
-def verify_rate_limit(api_key=None):
-    """
-    Verify rate limit for an API key and return the associated tier
-    
-    Args:
-        api_key (str, optional): API key to verify
+            if not check_rate_limit(api_key, tier):
+                return JSONResponse(
+                    status_code=429,
+                    content={
+                        "status": "error",
+                        "message": "Rate limit exceeded. Try again later."
+                    }
+                )
         
-    Returns:
-        str: Associated tier ('free', 'basic', or 'premium')
-    """
-    # Simple implementation to determine tier based on API key
-    # This could be expanded to check a database of registered keys
-    if not api_key:
+        response = await call_next(request)
+        return response
+
+def determine_tier(api_key: str) -> str:
+    """Determine tier based on API key"""
+    if not api_key or api_key == 'anonymous':
         return 'free'
     
-    # Example mapping of API keys to tiers
-    # In a real implementation, this would query a database
     if api_key.startswith('premium_'):
         return 'premium'
     elif api_key.startswith('basic_'):
@@ -77,26 +43,44 @@ def verify_rate_limit(api_key=None):
     else:
         return 'free'
 
-def setup_rate_limiter(app):
-    """
-    Configure the rate limiter for a Flask application
+def check_rate_limit(api_key: str, tier: str) -> bool:
+    """Check if request is within rate limits"""
+    # Create Redis keys
+    minute_key = f'rate_limit:{api_key}:{int(time.time()) // 60}'
+    daily_key = f'daily_quota:{api_key}:{int(time.time()) // 86400}'
     
-    Args:
-        app (Flask): Flask application instance
-    """
-    # Configure Redis connection based on app config
-    global redis_client
-    redis_client = redis.Redis(
-        host=app.config.get('REDIS_HOST', 'localhost'),
-        port=int(app.config.get('REDIS_PORT', 6379)),
-        db=int(app.config.get('REDIS_DB', 0))
-    )
+    # Get current usage counts
+    minute_count = redis_client.incr(minute_key)
+    if minute_count == 1:
+        redis_client.expire(minute_key, 60)
+        
+    daily_count = redis_client.incr(daily_key)
+    if daily_count == 1:
+        redis_client.expire(daily_key, 86400)
     
-    # Registering error handlers for rate limit errors
+    # Define tier limits
+    tier_limits = {
+        'free': {'per_minute': 10, 'per_day': 100},
+        'basic': {'per_minute': 30, 'per_day': 1000},
+        'premium': {'per_minute': 100, 'per_day': 10000}
+    }
     
-    @app.errorhandler(429)
-    def ratelimit_handler(e):
-        return jsonify({
-            "status": "error",
-            "message": "Rate limit exceeded. Please try again later."
-        }), 429
+    # Check limits
+    limits = tier_limits[tier]
+    return (minute_count <= limits['per_minute'] and 
+            daily_count <= limits['per_day'])
+
+def verify_rate_limit_fastapi(api_key: Optional[str] = None) -> str:
+    """Verify rate limit for FastAPI endpoints"""
+    if not api_key:
+        return 'free'
+    
+    tier = determine_tier(api_key)
+    
+    if not check_rate_limit(api_key, tier):
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded. Try again later."
+        )
+    
+    return tier
