@@ -2,7 +2,7 @@ import pytest
 import asyncio
 from fastapi.testclient import TestClient
 from app.main import app
-from app.config import settings
+from app.config import settings, create_agents
 
 @pytest.fixture
 def client():

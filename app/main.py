@@ -10,7 +10,11 @@ import json
 
 from app.middleware.rate_limiter import verify_rate_limit_fastapi, RateLimitMiddleware
 from worker.celery_app import process_query_task, get_task_status
-from config.settings import create_agents
+from app.api.schemas import (
+    QueryRequest, QueryResponse, TaskStatusResponse, 
+    SearchRequest, SearchResponse
+)
+from app.config import settings, create_agents
 from app.graph.multi_agent_workflow import create_multi_agent_graph
 from langchain_core.documents import Document
 
