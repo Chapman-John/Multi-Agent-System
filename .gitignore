@@ -208,7 +208,7 @@ temp/
 *.bak
 *.backup
 
-# Docker (remove docker-compose.yml from ignore since we want to include it)
+# Docker 
 .dockerignore
 docker-compose.override.yml
 docker-compose.local.yml
