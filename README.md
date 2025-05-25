@@ -23,12 +23,12 @@ By combining specialized agents with distinct capabilities and incorporating rob
 
 | Component | Technologies |
 |-----------|--------------|
-| **Framework** | LangChain, LangGraph |
-| **Models** | OpenAI, Anthropic Claude |
-| **Backend** | Flask, Python 3.9+ |
+| **Framework** | FastAPI, LangChain, LangGraph |
+| **Models** | OpenAI GPT-4, Anthropic Claude |
+| **Background Processing** | Celery, Redis |
 | **Infrastructure** | Docker, Redis, Cloud-ready |
 | **Search & Retrieval** | Tavily, ChromaDB |
-| **API Management** | Redis-based rate limiting |
+| **API Management** | FastAPI middleware, Redis-based rate limiting |
 
 ## 📊 System Architecture
 
@@ -164,15 +164,15 @@ print(result['output'])
 
 ### Customizing Agent Behavior
 
-Edit `config/settings.py` to modify:
+Edit `app/config.py` to modify:
 
 - LLM parameters (temperature, model selection)
-- Agent specialization settings
+- Agent specialization settings  
 - Tool configuration and integration
 
 ### Configuring Rate Limits
 
-Modify rate limit settings in `config/settings.py`:
+Modify rate limit settings in `app/config.py`:
 
 ```python
 RATE_LIMIT_TIERS = {
@@ -180,7 +180,6 @@ RATE_LIMIT_TIERS = {
     'basic': {'per_minute': 30, 'per_day': 1000},
     'premium': {'per_minute': 100, 'per_day': 10000}
 }
-```
 
 ### Adding Custom Tools
 
@@ -204,7 +203,7 @@ class CustomSearchTool(BaseTool):
 ## 📊 Performance Optimization
 
 - **Memory Management**: Configure `app/utils/search_rag.py` for optimal vector storage
-- **Caching**: Adjust caching parameters in `config/settings.py`
+- **Caching**: Adjust caching parameters in `app/config.py`
 - **Model Selection**: Balance performance and quality by selecting appropriate LLMs
 - **Redis Configuration**: Tune Redis for your expected traffic volume
 
