@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from typing import Optional, Dict, Any
 import os
 from dotenv import load_dotenv
@@ -67,8 +67,7 @@ class Settings(BaseSettings):
     RAG_ENABLED: bool = True
     MAX_DOCUMENTS: int = 5
 
-    class Config:
-        env_file = ".env"
+    model_config = {"env_file": ".env"}
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -155,7 +154,7 @@ def create_agents():
     writer = WriterAgent(
         name=settings.AGENT_CONFIGS['writer']['name'],
         llm=llms['writer'],
-        writing_style=settings.AGENT_CONFIGS['writer']['writing_style']
+        writing_style=settings.AGENT_CONFIGS['writer'].get('writing_style', 'professional')
     )
     
     reviewer = ReviewerAgent(
