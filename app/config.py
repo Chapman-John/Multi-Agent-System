@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     }
 }
     # Feature Flags
-    MIXED_PROVIDERS = True
+    MIXED_PROVIDERS: bool = True
     MCP_ENABLED: bool = True
     RAG_ENABLED: bool = True
     MAX_DOCUMENTS: int = 5
