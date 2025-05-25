@@ -10,7 +10,7 @@ services:
   app:
     build: .
     ports:
-      - "5001:5001"
+      - "8000:8000"
     environment:
       - REDIS_HOST=redis
       - REDIS_URL=redis://redis:6379

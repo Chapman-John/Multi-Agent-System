@@ -22,6 +22,6 @@ RUN useradd --create-home --shell /bin/bash app
 RUN chown -R app:app /app
 USER app
 
-EXPOSE 5000
+EXPOSE 8000
 
 CMD ["python", "run.py"]
