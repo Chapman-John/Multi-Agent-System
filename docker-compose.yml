@@ -5,10 +5,20 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - multi-agent-network
 
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     environment:
@@ -16,27 +26,82 @@ services:
       - REDIS_URL=redis://redis:6379
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - PORT=8000
+      - DEBUG=true
     env_file:
       - .env
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     volumes:
       - ./storage:/app/storage
+      - ./app:/app/app # For development - remove in production
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - multi-agent-network
 
   worker:
-    build: .
-    command: celery -A worker.celery_app worker --loglevel=info
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A worker.celery_app worker --loglevel=info --concurrency=2
     environment:
       - REDIS_HOST=redis
       - REDIS_URL=redis://redis:6379
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - DEBUG=true
     env_file:
       - .env
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     volumes:
       - ./storage:/app/storage
+      - ./app:/app/app # For development - remove in production
+      - ./worker:/app/worker # For development - remove in production
+    healthcheck:
+      test: [ "CMD", "celery", "-A", "worker.celery_app", "inspect", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - multi-agent-network
+
+  # Optional: Celery monitoring
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: celery -A worker.celery_app flower --port=5555
+    ports:
+      - "5555:5555"
+    environment:
+      - REDIS_HOST=redis
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - multi-agent-network
+    profiles:
+      - monitoring # Only start with: docker-compose --profile monitoring up
 
 volumes:
   redis_data:
+    driver: local
+
+networks:
+  multi-agent-network:
+    driver: bridge
