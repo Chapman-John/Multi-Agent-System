@@ -66,6 +66,22 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Create required directories
+        self._create_directories()
+    
+    def _create_directories(self):
+        """Create required directories if they don't exist"""
+        directories = [
+            self.VECTOR_DB_PATH,
+            "./storage/cache",
+            "./storage/logs"
+        ]
+        
+        for directory in directories:
+            os.makedirs(directory, exist_ok=True)
 
 settings = Settings()
 

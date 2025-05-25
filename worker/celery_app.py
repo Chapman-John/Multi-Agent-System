@@ -1,6 +1,6 @@
 from celery import Celery
 from app.config import settings
-from app.services.agent_service import agent_service
+from app.services.agent_service import get_agent_service
 import json
 import time
 from redis import Redis
@@ -29,7 +29,10 @@ def process_query_task(self, task_id: str, input_text: str, tier: str = "free"):
         priority_map = {"premium": 9, "basic": 5, "free": 1}
         self.request.delivery_info['priority'] = priority_map.get(tier, 1)
         
-        # Process query using agent service
+        # Get agent service and process query
+        agent_service = get_agent_service()
+        
+        # Use sync invoke since Celery tasks are synchronous
         result = agent_service.workflow.invoke({"input": input_text})
         
         output = result.get("final_output", "No output generated")

@@ -4,21 +4,21 @@ import redis
 import time
 from starlette.middleware.base import BaseHTTPMiddleware
 from typing import Optional
+from app.config import settings
 
-# Redis connection for storing rate limit data
-redis_client = redis.Redis(host='localhost', port=6379, db=0)
+# Use settings for Redis connection
+redis_client = redis.Redis(
+    host=settings.REDIS_HOST, 
+    port=settings.REDIS_PORT, 
+    db=settings.REDIS_DB
+)
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Only apply rate limiting to API endpoints
         if request.url.path.startswith('/api/'):
-            # Get API key from headers
             api_key = request.headers.get('X-API-Key', 'anonymous')
-            
-            # Determine tier
             tier = determine_tier(api_key)
             
-            # Check rate limits
             if not check_rate_limit(api_key, tier):
                 return JSONResponse(
                     status_code=429,
@@ -45,11 +45,9 @@ def determine_tier(api_key: str) -> str:
 
 def check_rate_limit(api_key: str, tier: str) -> bool:
     """Check if request is within rate limits"""
-    # Create Redis keys
     minute_key = f'rate_limit:{api_key}:{int(time.time()) // 60}'
     daily_key = f'daily_quota:{api_key}:{int(time.time()) // 86400}'
     
-    # Get current usage counts
     minute_count = redis_client.incr(minute_key)
     if minute_count == 1:
         redis_client.expire(minute_key, 60)
@@ -58,15 +56,8 @@ def check_rate_limit(api_key: str, tier: str) -> bool:
     if daily_count == 1:
         redis_client.expire(daily_key, 86400)
     
-    # Define tier limits
-    tier_limits = {
-        'free': {'per_minute': 10, 'per_day': 100},
-        'basic': {'per_minute': 30, 'per_day': 1000},
-        'premium': {'per_minute': 100, 'per_day': 10000}
-    }
-    
-    # Check limits
-    limits = tier_limits[tier]
+    # Use settings for tier limits
+    limits = settings.RATE_LIMIT_TIERS[tier]
     return (minute_count <= limits['per_minute'] and 
             daily_count <= limits['per_day'])
 
