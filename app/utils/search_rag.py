@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Optional
 from langchain_core.documents import Document
-from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_chroma import Chroma
+from langchain_openai import OpenAIEmbeddings
 from langchain_community.retrievers import TavilySearchAPIRetriever
 import os
 import json
@@ -95,7 +95,9 @@ class SearchRAGTool:
         
         # Add to vector store
         self.vector_store.add_documents(documents)
-        self.vector_store.persist()
+        # Note: persist() method may not be available in newer Chroma versions
+        if hasattr(self.vector_store, 'persist'):
+            self.vector_store.persist()
     
     def query_vector_store(self, query: str, k: int = 5) -> List[Document]:
         """
@@ -164,7 +166,8 @@ class SearchRAGTool:
             documents (List[Document]): Documents to add
         """
         self.vector_store.add_documents(documents)
-        self.vector_store.persist()
+        if hasattr(self.vector_store, 'persist'):
+            self.vector_store.persist()
 
     def __del__(self):
         """Destructor to clean up resources"""
@@ -176,8 +179,8 @@ class SearchRAGTool:
         """
         if hasattr(self, 'vector_store'):
             try:
-                # Some vector stores have explicit cleanup methods
-                if hasattr(self.vector_store, '_client'):
+                # Check if client exists and has close method
+                if hasattr(self.vector_store, '_client') and hasattr(self.vector_store._client, 'close'):
                     self.vector_store._client.close()
                 # Other cleanup as needed
             except Exception as e:

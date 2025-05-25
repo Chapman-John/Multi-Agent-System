@@ -1,5 +1,5 @@
 from typing import Dict, Any, List, Optional
-from langchain_anthropic import ChatAnthropicMessages
+from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.documents import Document
 from pydantic import BaseModel
@@ -26,9 +26,9 @@ def create_mcp_llm(api_key: str, model_name: str = "claude-3-opus-20240229", tem
         temperature (float): Temperature for generation
         
     Returns:
-        ChatAnthropicMessages: LLM configured for MCP
+        ChatAnthropic: LLM configured for MCP
     """
-    return ChatAnthropicMessages(
+    return ChatAnthropic(
         anthropic_api_key=api_key,
         model_name=model_name,
         temperature=temperature

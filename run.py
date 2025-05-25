@@ -15,8 +15,8 @@ from app.config import settings
 def main():
     """Main entry point for the application"""
     
-    # Determine port from environment or use default
-    port = int(os.getenv("PORT", 5000))
+    # Determine port from environment or use default (changed from 5000 to 8000)
+    port = int(os.getenv("PORT", 8000))
     host = os.getenv("HOST", "0.0.0.0")
     
     # Print startup information
