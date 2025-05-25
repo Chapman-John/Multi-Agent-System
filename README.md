@@ -8,9 +8,89 @@ This project implements a state-of-the-art multi-agent AI system that leverages 
 
 By combining specialized agents with distinct capabilities and incorporating robust rate limiting, this system delivers comprehensive, accurate, and well-structured responses to user queries while ensuring optimal resource utilization.
 
+## ✨ Key Features
+
+- **Intelligent Multi-Agent Collaboration**: Specialized agents work together through a sophisticated orchestration system
+- **Advanced RAG Integration**: Retrieval-Augmented Generation enhances responses with relevant context
+- **Dynamic Research Capabilities**: Comprehensive information gathering from multiple sources
+- **Quality-Focused Processing**: Built-in review and revision process ensures high-quality outputs
+- **Scalable Architecture**: Cloud-ready design supports distributed deployment
+- **Tiered Rate Limiting**: Redis-based rate limiting with customizable tiers for different usage levels
+
 ![image](https://github.com/user-attachments/assets/bce905c5-a091-4db8-8809-004eae8ac70c)
 
-## ✨ Key Features
+## 🔧 Core Technologies
+
+| Component | Technologies |
+|-----------|--------------|
+| **Framework** | FastAPI, LangChain, LangGraph |
+| **Models** | OpenAI GPT-4, Anthropic Claude |
+| **Background Processing** | Celery, Redis |
+| **Infrastructure** | Docker, Redis, Cloud-ready |
+| **Search & Retrieval** | Tavily, ChromaDB |
+| **API Management** | FastAPI middleware, Redis-based rate limiting |
+
+## 📊 System Architecture
+
+### Agent Ecosystem
+
+The system employs specialized agents, each with distinct responsibilities:
+
+1. **RAG Agent**: Enhances queries with relevant context from vector stores and search results
+2. **Researcher Agent**: Gathers comprehensive information from multiple sources
+3. **Writer Agent**: Synthesizes research into coherent, well-structured content
+4. **Reviewer Agent**: Provides critical analysis and quality assurance
+
+### Workflow Orchestration
+
+- **Event-Driven Design**: LangGraph enables sophisticated state management
+- **Conditional Processing**: Intelligent routing based on quality assessments
+- **Iterative Refinement**: Automatic revision cycles ensure high-quality output
+
+### Advanced RAG Implementation
+
+- **Hybrid Search**: Combines vector similarity with keyword search
+- **Document Deduplication**: Intelligent merging of information from multiple sources
+- **Persistent Vector Storage**: Efficient caching of previously retrieved information
+
+### Rate Limiting Middleware
+
+- **Tiered Usage Plans**: Configurable rate limits based on user tiers (free, basic, premium)
+- **Redis-Based Tracking**: Efficient, distributed request counting and quota management
+- **Time-Window Limits**: Both per-minute and daily quota constraints
+- **API Key Authentication**: Rate limits tied to individual API keys
+
+## 🛠️ Installation
+
+### Prerequisites
+
+- Python 3.9+
+- OpenAI API Key
+- Tavily API Key 
+- Anthropic API Key
+- Redis Server (for rate limiting and background processing)
+
+### Method 1: Local Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Chapman-John/multi-agent-system.git
+cd multi-agent-system
+
+# Create and activate virtual environment
+python3.11 -m venv env
+source env/bin/activate  # On Windows: env\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Install and start Redis (if not already running)
+# For Ubuntu/Debian: sudo apt-get install redis-server
+# For macOS: brew install redis && brew services start redis
+
+# Configure environment variables
+cp .env.example .env
+# Edit .env with your API keys and configuration
 
 - **Intelligent Multi-Agent Collaboration**: Specialized agents work together through a sophisticated orchestration system
 - **Advanced RAG Integration**: Retrieval-Augmented Generation enhances responses with relevant context
