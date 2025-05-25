@@ -36,30 +36,33 @@ class Settings(BaseSettings):
     
     # Agent Configuration
     AGENT_CONFIGS: Dict[str, Dict[str, Any]] = {
-        'rag': {
-            'name': 'RAG Processor',
-            'model': 'claude-3-sonnet-20240229',
-            'temperature': 0.2
-        },
-        'researcher': {
-            'name': 'Research Assistant',
-            'model': 'claude-3-opus-20240229',
-            'temperature': 0.7
-        },
-        'writer': {
-            'name': 'Content Writer',
-            'model': 'claude-3-opus-20240229',
-            'temperature': 0.6,
-            'writing_style': 'professional'
-        },
-        'reviewer': {
-            'name': 'Content Reviewer',
-            'model': 'claude-3-haiku-20240307',
-            'temperature': 0.5
-        }
+    'rag': {
+        'name': 'RAG Processor',
+        'model': 'gpt-3.5-turbo',
+        'temperature': 0.1,
+        'provider': 'openai'
+    },
+    'researcher': {
+        'name': 'Research Assistant',
+        'model': 'gpt-4-turbo-preview',
+        'temperature': 0.7,
+        'provider': 'openai'
+    },
+    'writer': {
+        'name': 'Content Writer',
+        'model': 'claude-3-opus-20240229',
+        'temperature': 0.6,
+        'provider': 'anthropic'
+    },
+    'reviewer': {
+        'name': 'Content Reviewer',
+        'model': 'gpt-3.5-turbo',
+        'temperature': 0.3,
+        'provider': 'openai'
     }
-    
+}
     # Feature Flags
+    MIXED_PROVIDERS = True
     MCP_ENABLED: bool = True
     RAG_ENABLED: bool = True
     MAX_DOCUMENTS: int = 5
@@ -106,30 +109,33 @@ def create_agents():
             persist_dir=settings.VECTOR_DB_PATH
         )
     
-    # Create LLMs based on configuration
-    if settings.MCP_ENABLED and settings.ANTHROPIC_API_KEY:
-        llms = {
-            'rag': create_mcp_llm(settings.ANTHROPIC_API_KEY, 
-                                settings.AGENT_CONFIGS['rag']['model'],
-                                settings.AGENT_CONFIGS['rag']['temperature']),
-            'researcher': create_mcp_llm(settings.ANTHROPIC_API_KEY,
-                                       settings.AGENT_CONFIGS['researcher']['model'],
-                                       settings.AGENT_CONFIGS['researcher']['temperature']),
-            'writer': create_mcp_llm(settings.ANTHROPIC_API_KEY,
-                                   settings.AGENT_CONFIGS['writer']['model'],
-                                   settings.AGENT_CONFIGS['writer']['temperature']),
-            'reviewer': create_mcp_llm(settings.ANTHROPIC_API_KEY,
-                                     settings.AGENT_CONFIGS['reviewer']['model'], 
-                                     settings.AGENT_CONFIGS['reviewer']['temperature'])
-        }
-    else:
-        # Fallback to OpenAI
-        llms = {
-            'rag': ChatOpenAI(model="gpt-4-turbo", temperature=0.2),
-            'researcher': ChatOpenAI(model="gpt-4-turbo", temperature=0.7),
-            'writer': ChatOpenAI(model="gpt-4-turbo", temperature=0.6),
-            'reviewer': ChatOpenAI(model="gpt-4-turbo", temperature=0.5)
-        }
+    # Create LLMs based on individual agent configuration
+    llms = {}
+    
+    for agent_name, config in settings.AGENT_CONFIGS.items():
+        provider = config.get('provider', 'anthropic')
+        model = config['model']
+        temperature = config['temperature']
+        
+        if provider == 'anthropic' and settings.ANTHROPIC_API_KEY:
+            llms[agent_name] = create_mcp_llm(
+                api_key=settings.ANTHROPIC_API_KEY,
+                model_name=model,
+                temperature=temperature
+            )
+        elif provider == 'openai' and settings.OPENAI_API_KEY:
+            llms[agent_name] = ChatOpenAI(
+                model=model,
+                temperature=temperature,
+                openai_api_key=settings.OPENAI_API_KEY
+            )
+        else:
+            # Fallback to GPT-3.5
+            llms[agent_name] = ChatOpenAI(
+                model="gpt-3.5-turbo",
+                temperature=temperature,
+                openai_api_key=settings.OPENAI_API_KEY
+            )
     
     # Create agents
     web_search_tool = create_tool(WebSearchTool)
