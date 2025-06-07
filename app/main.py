@@ -444,6 +444,26 @@ async def process_query(
             detail=f"Internal server error: {str(e)}"
         )
 
+@app.post("/api/process/stream")
+async def process_query_stream(
+    request: QueryRequest,
+    x_api_key: Optional[str] = Header(None),
+):
+    """Process query with streaming responses"""
+    from fastapi.responses import StreamingResponse
+    
+    async def generate_stream():
+        # Yield progress updates as agents work
+        yield f"data: {json.dumps({'stage': 'rag', 'message': 'Gathering context...'})}\n\n"
+        
+        # Process through agents with yield points
+        for stage, result in agent_workflow_with_streaming(request.input):
+            yield f"data: {json.dumps({'stage': stage, 'content': result})}\n\n"
+        
+        yield f"data: {json.dumps({'stage': 'complete', 'final': True})}\n\n"
+    
+    return StreamingResponse(generate_stream(), media_type="text/plain")
+
 @app.get("/api/task/{task_id}", response_model=TaskStatusResponse)
 async def get_task(task_id: str):
     """Get the status and result of a task"""
